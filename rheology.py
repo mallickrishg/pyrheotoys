@@ -1,4 +1,4 @@
-""" Definition of various rheological objects (linear Maxwell, Burgers, power-law Maxwell, Burgers, 
+""" Definition of various rheological objects (linear and power-law Maxwell, Burgers, 
 rate-dependent friction and rate-state friction) and the associated ODE functions
 We consider 3 cases for the ODE
 (1) When inelastic strain rate is known (edot_pl)
@@ -8,6 +8,7 @@ We consider 3 cases for the ODE
 Written by Rishav Mallick, Caltech Seismolab, 2022
 """
 from scipy import integrate
+import numpy as np
 
 class linburgers:
     def __init__(self,G = 100e3, Gk = 100e3, 
@@ -28,8 +29,8 @@ class linburgers:
         """ Long-term inelastic strain rate (1/s) """
 
     # define ode to be solved when edot_pl is known
-    def Y0_initial(self,dtau):
-        return [self.edot_pl*self.eta_m + dtau, 0]
+    def Y0_initial(self,dtau,edot_i,ek=0.):
+        return [edot_i*self.eta_m + dtau, ek]
 
     def ode_edot_pl(self,t,Y):
         """ integrate time derivatives of sigma and kelvin strain"""
@@ -67,9 +68,9 @@ class Maxwell:
         """ Long-term inelastic strain rate (1/s) """
 
     # define ode to be solved when edot_pl is known
-    def Y0_initial(self,dtau):
+    def Y0_initial(self,dtau,edot_i):
         """ Return initial strain and strain rate """
-        return  [0,self.A*((self.edot_pl/self.A)**(1/self.n) + dtau)**self.n]
+        return  [0,self.A*((edot_i/self.A)**(1/self.n) + dtau)**self.n]
 
     def ode_edot_pl(self,t,Y):
         """ integrate time derivatives of strain and strain rate"""
@@ -77,3 +78,24 @@ class Maxwell:
         sigmadot = self.G*(self.edot_pl - edot) 
         acc = sigmadot/(edot**(1/self.n-1))*self.n*self.A**(1/self.n)
         return [edot,acc]
+
+class ratefriction:
+    def __init__(self,G = 100e3, Asigma = 1, edot_pl = 1e-14):
+        self.G = G
+        """ Shear Modulus in Maxwell element (MPa)"""
+        self.Asigma = Asigma
+        """ (a-b)sigma_n for frictional slider (MPa)"""
+        self.edot_pl = edot_pl
+        """ Long-term inelastic strain rate (1/s) """
+
+    def Y0_initial(self,dtau,vi):
+        """ initialize slip and slip rate"""
+        return [0,vi*np.exp(dtau/self.Asigma)]
+
+    def ode_edot_pl(self,t,Y):
+        """ integrate time derivatives of strain and strain rate"""
+        edot = Y[1]
+        sigmadot = self.G*(self.edot_pl - edot) 
+        acc = sigmadot*edot/self.Asigma
+        return [edot,acc]
+
