@@ -7,6 +7,8 @@ We consider 3 cases for the ODE
 
 Written by Rishav Mallick, Caltech Seismolab, 2022
 """
+from scipy import integrate
+
 class linburgers:
     def __init__(self,G = 100e3, Gk = 100e3, 
     nm = 1, etam = 1e15, nk = 1, etak = 1e12, edot_pl = 1e-14):
@@ -42,6 +44,11 @@ class linburgers:
         emdot = sigma/self.eta_m
         ekdot = (sigma - self.G_k*ek)/self.eta_k
         return [emdot,ekdot]
+
+    def get_e(self,t,emdot,ekdot):
+        em = integrate.cumulative_trapezoid(emdot,t, initial = 0)
+        ek = integrate.cumulative_trapezoid(ekdot,t, initial = 0)
+        return [em,ek]
 
 
 class Maxwell:
