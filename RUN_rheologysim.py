@@ -1,15 +1,15 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 import rheology
 from scipy.integrate import solve_ivp
-from scipy.integrate import cumulative_trapezoid as cumtrapz
 
 # simulate earthquake cycles
 nyears = 100
 Trecur = nyears*3.15e7
 
 # stress perturbation
-delsigma = 5 #in MPa
+delsigma = 10 #in MPa
 # long-term strain rate
 epl = 1e-14 # 1/s
 
@@ -23,9 +23,8 @@ Y0 = evl.Y0_initial(delsigma,evl.edot_pl)# get initial conditions
 sol = solve_ivp(evl.ode_edot_pl, [0,Trecur], Y0, method="Radau", rtol=1e-12, atol=1e-12)
 emdot,ekdot = evl.get_edot(sol.y[0,:],sol.y[1,:])
 em,ek = evl.get_e(sol.t,emdot,ekdot)
-# em = cumtrapz(emdot,sol.t)
 
-## print solution
+# print solution
 plt.figure(1,figsize=(8,8))
 plt.subplot(221)
 plt.plot(sol.t/3.15e7,sol.y[0,:])
@@ -52,7 +51,7 @@ plt.legend(['Maxwell','Kelvin','Total'])
 plt.xscale('log'), plt.yscale('linear')
 plt.grid(True)
 # plt.show()
-
+#%%
 # define parameters for Maxwell object
 evl = rheology.Maxwell(n = 1, A = 1e-12, edot_pl=epl)
 
@@ -112,3 +111,7 @@ plt.xscale('log'), plt.yscale('log')
 plt.grid(True)
 
 plt.show()
+
+
+
+# %%

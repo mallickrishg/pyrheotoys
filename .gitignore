@@ -1,2 +1,5 @@
 my_integration.py
 test_linvisco.py
+environment-dev.yml
+.ipy*
+__py*

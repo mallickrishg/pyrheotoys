@@ -1,9 +1,8 @@
 """ Definition of various rheological objects (linear and power-law Maxwell, Burgers, 
 rate-dependent friction and rate-state friction) and the associated ODE functions
-We consider 3 cases for the ODE
-(1) When inelastic strain rate is known (edot_pl)
-(2) When applied stress is fixed
-(3) When total velocity or strain rate (elastic + inelastic) is fixed
+We consider 2 cases for the ODE
+(1) When total strain rate is known (edot_pl)
+(2) When applied stress is known
 
 Written by Rishav Mallick, Caltech Seismolab, 2022
 """
@@ -33,7 +32,7 @@ class linburgers:
         return [edot_i*self.eta_m + dtau, ek]
 
     def ode_edot_pl(self,t,Y):
-        """ integrate time derivatives of sigma and kelvin strain"""
+        """ integrate time derivatives of stress and kelvin strain"""
         sigma = Y[0]
         ek = Y[1]
         ekdot = (sigma - self.G_k*ek)/self.eta_k
@@ -47,6 +46,7 @@ class linburgers:
         return [emdot,ekdot]
 
     def get_e(self,t,emdot,ekdot):
+        """ integrate Maxwell and Kelvin strain rates to get respective strain time series"""
         em = integrate.cumulative_trapezoid(emdot,t, initial = 0)
         ek = integrate.cumulative_trapezoid(ekdot,t, initial = 0)
         return [em,ek]
