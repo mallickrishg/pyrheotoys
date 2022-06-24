@@ -99,3 +99,40 @@ class ratefriction:
         acc = sigmadot*edot/self.Asigma
         return [edot,acc]
 
+class ratestatefriction:
+    def __init__(self,G = 100e3, a = 0.01, b = 0.005, 
+    sigma = 50, dc = 0.01, edot_pl = 1e-14, edot0 = 1e-10, Vs = 3e3):
+        self.G = G
+        """ Shear Modulus in Maxwell element (MPa)"""
+        self.a = a
+        """ (a-b)sigma_n for frictional slider (MPa)"""
+        self.b = b
+        """ (a-b)sigma_n for frictional slider (MPa)"""
+        self.sigma = sigma
+        """ (a-b)sigma_n for frictional slider (MPa)"""
+        self.dc = dc
+        """ critical slip distance (m) or critical strain (no unit)"""
+        self.edot_pl = edot_pl
+        """ Long-term inelastic strain rate (1/s) """
+        self.edot0 = edot0
+        """ normalization constant for strain rate (1/s)"""
+        self.Vs = Vs
+        """ Shear wave velocity in the medium (m/s)"""
+
+    def Y0_initial(self, dtau, edoti = 1e-9, thetai = 1.):
+        """ initialize slip, log(theta), log(slip rate)"""
+        return [0, np.log(self.edot0*thetai/self.dc) , np.log(edoti*np.exp(dtau/self.a/self.sigma)/self.edot0)]
+
+    def ode_edot_pl(self,t,Y):
+        """ integrate time derivatives of strain, log(theta) and log(strain rate)
+        use transformed variables phi = log(edot0*theta/dc), zeta = log(edot/edot0)"""
+        phi = Y[1]
+        edot = self.edot0*np.exp(Y[2])
+        damping = 0.5*self.G/self.Vs
+
+        dphi = (self.edot0*np.exp(-phi) - edot)/self.dc
+        sigmadot = self.G*(self.edot_pl - edot) 
+        dzeta = (sigmadot - self.b*self.sigma*dphi)/(self.a*self.sigma + damping*edot)
+        return [edot,dphi,dzeta]
+
+    
