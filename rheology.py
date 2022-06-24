@@ -28,7 +28,8 @@ class linburgers:
         """ Long-term inelastic strain rate (1/s) """
 
     # define ode to be solved when edot_pl is known
-    def Y0_initial(self,dtau,edot_i,ek=0.):
+    def Y0_initial_edot(self,dtau,edot_i,ek=0.):
+        """ return initial stress and Kelvin strain"""
         return [edot_i*self.eta_m + dtau, ek]
 
     def ode_edot_pl(self,t,Y):
@@ -68,7 +69,7 @@ class Maxwell:
         """ Long-term inelastic strain rate (1/s) """
 
     # define ode to be solved when edot_pl is known
-    def Y0_initial(self,dtau,edot_i):
+    def Y0_initial_edot(self,dtau,edot_i):
         """ Return initial strain and strain rate """
         return  [0,self.A*((edot_i/self.A)**(1/self.n) + dtau)**self.n]
 
@@ -79,6 +80,9 @@ class Maxwell:
         acc = sigmadot/(edot**(1/self.n-1))*self.n*self.A**(1/self.n)
         return [edot,acc]
 
+    def ode_stress(self,t,Y):
+        return 
+
 class ratefriction:
     def __init__(self,G = 100e3, Asigma = 1, edot_pl = 1e-14):
         self.G = G
@@ -88,7 +92,7 @@ class ratefriction:
         self.edot_pl = edot_pl
         """ Long-term inelastic strain rate (1/s) """
 
-    def Y0_initial(self,dtau,vi):
+    def Y0_initial_edot(self,dtau,vi):
         """ initialize slip and slip rate"""
         return [0,vi*np.exp(dtau/self.Asigma)]
 
@@ -119,7 +123,7 @@ class ratestatefriction:
         self.Vs = Vs
         """ Shear wave velocity in the medium (m/s)"""
 
-    def Y0_initial(self, dtau, edoti = 1e-9, thetai = 1.):
+    def Y0_initial_edot(self, dtau, edoti = 1e-9, thetai = 1.):
         """ initialize slip, log(theta), log(slip rate)"""
         return [0, np.log(self.edot0*thetai/self.dc) , np.log(edoti*np.exp(dtau/self.a/self.sigma)/self.edot0)]
 
