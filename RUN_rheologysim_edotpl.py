@@ -9,7 +9,7 @@ nyears = 100
 Trecur = nyears*3.15e7
 
 # stress perturbation
-delsigma = 1 #in MPa
+delsigma = 3 #in MPa
 # long-term strain rate
 epl = 1e-14 # 1/s
 
@@ -30,6 +30,7 @@ plt.subplot(221)
 plt.plot(sol.t/3.15e7,sol.y[0,:])
 plt.ylabel('Stress (MPa)')
 plt.grid(True)
+plt.xlim((1e-4,nyears))
 plt.xscale('log'), plt.yscale('linear')
 
 plt.subplot(2,2,2)
@@ -39,6 +40,7 @@ plt.ylabel('Normalized Strain rate')
 plt.xlabel('t (yrs)')
 plt.legend(['Maxwell','Total'])
 plt.xscale('log'), plt.yscale('log')
+plt.xlim((1e-4,nyears))
 plt.grid(True)
 
 plt.subplot(2,1,2)
@@ -50,7 +52,7 @@ plt.xlabel('t (yrs)')
 plt.legend(['Maxwell','Kelvin','Total'])
 plt.xscale('log'), plt.yscale('linear')
 plt.grid(True)
-# plt.show()
+plt.xlim((1e-4,nyears))
 
 # define parameters for Maxwell object
 evl = rheology.Maxwell(n = 1, A = 1e-12, edot_pl=epl)
@@ -77,6 +79,7 @@ plt.ylabel('Normalized Strain rate')
 plt.xlabel('t (yrs)')
 plt.xscale('log'), plt.yscale('log')
 plt.grid(True)
+plt.xlim((1e-4,nyears))
 
 plt.subplot(212)
 plt.plot(sol.t/3.15e7,em)
@@ -84,6 +87,7 @@ plt.xlabel('t (yrs)')
 plt.ylabel('Strain')
 plt.grid(True)
 plt.xscale('log'), plt.yscale('linear')
+plt.xlim((1e-4,nyears))
 
 # define parameters for Rate-friction object
 evl = rheology.ratefriction(Asigma=0.5, edot_pl=epl)
@@ -101,6 +105,7 @@ plt.plot(sol.t/3.15e7,ef)
 plt.ylabel('Strain')
 plt.xlabel('t (yrs)')
 plt.grid(True)
+plt.xlim((1e-4,nyears))
 plt.xscale('log'), plt.yscale('linear')
 
 plt.subplot(211)
@@ -109,6 +114,7 @@ plt.ylabel('Normalized Strain rate')
 plt.xlabel('t (yrs)')
 plt.xscale('log'), plt.yscale('log')
 plt.grid(True)
+plt.xlim((1e-4,nyears))
 
 #%% define parameters for Rate-state-friction object
 # epl = 1e-14
@@ -130,6 +136,7 @@ plt.ylabel('Strain')
 plt.xlabel('t (yrs)')
 plt.grid(True)
 plt.xscale('log'), plt.yscale('linear')
+plt.xlim((1e-4,nyears))
 
 plt.subplot(211)
 plt.plot(sol.t/3.15e7,efdot/evl.edot_pl)
@@ -137,6 +144,7 @@ plt.ylabel('Normalized Strain rate')
 plt.xlabel('t (yrs)')
 plt.xscale('log'), plt.yscale('log')
 plt.grid(True)
+plt.xlim((1e-4,nyears))
 plt.show()
 
 # %%
